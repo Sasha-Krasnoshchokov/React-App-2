@@ -1,9 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
+
 import { ID, IHistory } from '../types/common';
 import { IBoardTask, IBoardList, IBoard } from '../types/boards';
 
 const API = axios.create({
-  baseURL: 'http://localhost:4000/',
+  baseURL: process.env.NODE_ENV === 'production' ? 'https://react-app-2-42b2.onrender.com' : 'http://localhost:4000/',
 });
 
 export type TMethod = 'get' | 'post' | 'patch' | 'delete';
