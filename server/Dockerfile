@@ -1,6 +1,9 @@
 # Use the official Node.js image as the base image
 FROM node:lts-alpine3.18 as builder
 
+docker pull postgres
+docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
+
 # Set the working directory
 WORKDIR /server
 
