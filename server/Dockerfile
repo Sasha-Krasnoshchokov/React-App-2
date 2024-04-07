@@ -1,6 +1,6 @@
-FROM postgres:16-alpine3.18
+# FROM postgres:16-alpine3.18
 
-RUN docker pull postgres
+RUN docker pull postgres:16-alpine3.18
 RUN docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
 
 # Use the official Node.js image as the base image
