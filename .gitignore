@@ -24,3 +24,5 @@
 /server/.env.local
 # Diagnostic reports (https://nodejs.org/api/report.html)
 /server/report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+*storybook.log
