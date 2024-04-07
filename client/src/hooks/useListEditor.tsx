@@ -20,22 +20,26 @@ const useListEditor = () => {
   const { boardId, listId, action, boardEntity } = useSelector((state: RootState) => state.modalPopup.modalPopup);
 
   const [isEdit, setIsEdit] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
 
-  const [currentList, setCurrentList] = useState<IBoard | IBoardList | null>(null);
+  const [currentData, setCurrentData] = useState<IBoard | IBoardList | null>(null);
 
   const getEntityById = useCallback(async () => {
+    setIsFetching(true);
     const response = await requests.get({
       entity: `${boardEntity}s`,
       boardId,
       listId,
     });
-    setCurrentList(response?.data?.data ?? null);
+    setIsFetching(false);
+    setCurrentData(response?.data?.data ?? null);
   }, [boardId, listId, boardEntity]);
 
   const updateServer = useCallback(
     async (method: TMethod, body?: IBoardList | IHistory, entity?: 'activities') => {
+      setIsFetching(true);
       await requests[method]({
         query: {
           entity: entity ?? `${boardEntity}s`,
@@ -44,6 +48,7 @@ const useListEditor = () => {
         },
         body,
       });
+      setIsFetching(false);
     },
     [boardId, listId, boardEntity]
   );
@@ -51,8 +56,8 @@ const useListEditor = () => {
   const handleEditorAction = useCallback(async () => {
     if (
       action === 'edit' &&
-      (!newTitle || newTitle === currentList?.title) &&
-      (!newDescription || newDescription === currentList?.description)
+      (!newTitle || newTitle === currentData?.title) &&
+      (!newDescription || newDescription === currentData?.description)
     ) {
       setIsEdit(!isEdit);
       return;
@@ -63,7 +68,7 @@ const useListEditor = () => {
     let contentDescription = `the ${boardEntity} label`;
     switch (action) {
       case 'delete':
-        strongLabel1 = currentList?.title ?? '';
+        strongLabel1 = currentData?.title ?? '';
         contentDescription = `the ${boardEntity}`;
         await updateServer('delete');
         if (boardEntity === 'board') {
@@ -72,16 +77,16 @@ const useListEditor = () => {
         }
         break;
       case 'edit':
-        strongLabel1 = currentList?.title ?? '';
+        strongLabel1 = currentData?.title ?? '';
         strongLabel2 = newTitle;
         newDescription &&
-          newDescription !== currentList?.description &&
+          newDescription !== currentData?.description &&
           (contentDescription = `the description of the ${boardEntity}`);
-        newTitle && newTitle !== currentList?.title && (contentDescription = `the label of the ${boardEntity} from`);
+        newTitle && newTitle !== currentData?.title && (contentDescription = `the label of the ${boardEntity} from`);
         newBody = {
-          ...currentList,
-          title: newTitle || currentList?.title || '',
-          description: newDescription || currentList?.description || '',
+          ...currentData,
+          title: newTitle || currentData?.title || '',
+          description: newDescription || currentData?.description || '',
         };
         await updateServer('patch', newBody);
         break;
@@ -113,7 +118,7 @@ const useListEditor = () => {
     await updateServer('post', newActivity, 'activities');
     dispatch(resetModalConfig());
     dispatch(setIsContentUpdate({ shouldMainContentUpdate: true, shouldOperationMenuUpdate: true }));
-  }, [boardEntity, action, currentList, dispatch, isEdit, newDescription, newTitle, updateServer, boardId]);
+  }, [boardEntity, action, currentData, dispatch, isEdit, newDescription, newTitle, updateServer, boardId]);
 
   useEffect(() => {
     setIsEdit(action === 'create');
@@ -125,8 +130,9 @@ const useListEditor = () => {
   return {
     isEdit,
     newTitle,
+    isFetching,
     boardEntity,
-    currentList,
+    currentData,
     newDescription,
     actionIconUrl: action === 'delete' ? deleteIconUrl : editIconUrl,
     setNewTitle,

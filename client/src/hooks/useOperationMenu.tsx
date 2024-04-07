@@ -12,6 +12,7 @@ const useOperationMenu = () => {
   const { activeMenu } = useSelector((state: RootState) => state.activeMenu);
   const { shouldOperationMenuUpdate } = useSelector((state: RootState) => state.contentUpdate);
 
+  const [isFetching, setIsFetching] = useState(false);
   const [selectedOperationMenu, setSelectedOperationMenu] = useState<IBoard | null>(null);
   const [dataFromServer, setDataFromServer] = useState<IBoard[]>([]);
   const isAddEntityBtn = useMemo(() => activeMenu.id === 'boards' || activeMenu.id === 'teams', [activeMenu]);
@@ -32,14 +33,15 @@ const useOperationMenu = () => {
       setDataFromServer([]);
       return;
     }
+    setIsFetching(true);
     const response = await requests.get({ entity: 'boards' });
-    setDataFromServer(response?.data?.data ?? []);
 
+    setIsFetching(false);
+    setDataFromServer(response?.data?.data ?? []);
     dispatch(setIsContentUpdate({ shouldMainContentUpdate: true, shouldOperationMenuUpdate: false }));
   }, [dispatch, activeMenu]);
 
   useEffect(() => {
-    // if (!activeMenu.id && !shouldOperationMenuUpdate) return;
     if (shouldOperationMenuUpdate) {
       getData();
     }
@@ -55,13 +57,14 @@ const useOperationMenu = () => {
           iconUrl: '',
         })
       );
-      dispatch(setIsContentUpdate({ shouldMainContentUpdate: true, shouldOperationMenuUpdate: true }));
+      dispatch(setIsContentUpdate({ shouldMainContentUpdate: true, shouldOperationMenuUpdate: false }));
     },
     [dispatch]
   );
 
   return {
     activeMenu,
+    isFetching,
     dataFromServer,
     isAddEntityBtn,
     selectedOperationMenu,

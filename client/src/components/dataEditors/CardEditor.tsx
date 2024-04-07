@@ -13,6 +13,7 @@ import priorityIconUrl from '../../assets/priority.svg';
 import Selector from '../features/Selector';
 import priorities from '../../data/priorities';
 import { Activities } from '../modals/History';
+import LoadingSpinner from '../general/LoadingSpinner';
 
 interface IProps {
   listId?: ID;
@@ -22,9 +23,10 @@ interface IProps {
 const CardEditor: React.FC<IProps> = ({ action }) => {
   const {
     isEdit,
+    status,
+    isFetching,
     currentTask,
     actionIconUrl,
-    status,
     handleDate,
     setNewTitle,
     setNewDescription,
@@ -34,78 +36,88 @@ const CardEditor: React.FC<IProps> = ({ action }) => {
 
   return (
     <CardEditorWrapper role="form">
-      <CardContentWrapper>
-        <EditorTitleWrapper>
-          <EditorTitle>
+      {isFetching && !currentTask ? (
+        <LoadingSpinner />
+      ) : (
+        <CardContentWrapper>
+          <EditorTitleWrapper>
+            <EditorTitle>
+              {isEdit ? (
+                <input
+                  autoFocus
+                  tabIndex={1}
+                  placeholder="Add title"
+                  defaultValue={currentTask?.title || ''}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                />
+              ) : (
+                <span>{currentTask?.title || ''}</span>
+              )}
+            </EditorTitle>
+            {isFetching ? (
+              <div className="spinner">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <EditorAction
+                type="button"
+                tabIndex={3}
+                $isEdit={isEdit}
+                $iconUrl={actionIconUrl}
+                $isDisabled={false}
+                onClick={handleEditorAction}
+              >
+                {`${isEdit ? 'Save' : capitalize(action?.toLowerCase().replace('task', '') || '')} task`}
+              </EditorAction>
+            )}
+          </EditorTitleWrapper>
+          <CardInfoWrapper>
+            <CardInfoRow>
+              <CardInfoLabel $iconUrl={statusIconUrl}>Status</CardInfoLabel>
+              <span>{capitalize(currentTask?.status ?? status ?? '')}</span>
+            </CardInfoRow>
+            <CardInfoRow>
+              <CardInfoLabel $iconUrl={calendarIconUrl}>Due date</CardInfoLabel>
+              {isEdit ? (
+                <CardDatePicker
+                  type="date"
+                  defaultValue={currentTask?.dueDate ?? ''}
+                  onChange={handleDate}
+                />
+              ) : (
+                <span>{currentTask?.dueDate ?? ''}</span>
+              )}
+            </CardInfoRow>
+            <CardInfoRow>
+              <CardInfoLabel $iconUrl={priorityIconUrl}>Priority</CardInfoLabel>
+              {isEdit ? (
+                <Selector
+                  options={priorities}
+                  defaultTitle={(currentTask?.priority ?? priorities[0].title ?? '') as string}
+                  getSelectedOption={handlePriority}
+                />
+              ) : (
+                <span>{(currentTask?.priority ?? priorities[0].title ?? '') as string}</span>
+              )}
+            </CardInfoRow>
+          </CardInfoWrapper>
+          <EditorDescription>
+            Description
             {isEdit ? (
-              <input
-                autoFocus
-                tabIndex={1}
-                placeholder="Add title"
-                defaultValue={currentTask?.title || ''}
-                onChange={(e) => setNewTitle(e.target.value)}
+              <textarea
+                rows={1}
+                tabIndex={4}
+                placeholder="Add description"
+                defaultValue={currentTask?.description}
+                // value={(newDescription || currentTask?.description) ?? ''}
+                onChange={(e) => setNewDescription(e.target.value)}
               />
             ) : (
-              <span>{currentTask?.title || ''}</span>
+              <span>{currentTask?.description ?? ''}</span>
             )}
-          </EditorTitle>
-          <EditorAction
-            type="button"
-            tabIndex={3}
-            $isEdit={isEdit}
-            $iconUrl={actionIconUrl}
-            $isDisabled={false}
-            onClick={handleEditorAction}
-          >
-            {`${isEdit ? 'Save' : capitalize(action?.toLowerCase().replace('task', '') || '')} task`}
-          </EditorAction>
-        </EditorTitleWrapper>
-        <CardInfoWrapper>
-          <CardInfoRow>
-            <CardInfoLabel $iconUrl={statusIconUrl}>Status</CardInfoLabel>
-            <span>{capitalize(currentTask?.status ?? status ?? '')}</span>
-          </CardInfoRow>
-          <CardInfoRow>
-            <CardInfoLabel $iconUrl={calendarIconUrl}>Due date</CardInfoLabel>
-            {isEdit ? (
-              <CardDatePicker
-                type="date"
-                defaultValue={currentTask?.dueDate ?? ''}
-                onChange={handleDate}
-              />
-            ) : (
-              <span>{currentTask?.dueDate ?? ''}</span>
-            )}
-          </CardInfoRow>
-          <CardInfoRow>
-            <CardInfoLabel $iconUrl={priorityIconUrl}>Priority</CardInfoLabel>
-            {isEdit ? (
-              <Selector
-                options={priorities}
-                defaultTitle={(currentTask?.priority ?? priorities[0].title ?? '') as string}
-                getSelectedOption={handlePriority}
-              />
-            ) : (
-              <span>{(currentTask?.priority ?? priorities[0].title ?? '') as string}</span>
-            )}
-          </CardInfoRow>
-        </CardInfoWrapper>
-        <EditorDescription>
-          Description
-          {isEdit ? (
-            <textarea
-              rows={1}
-              tabIndex={4}
-              placeholder="Add description"
-              defaultValue={currentTask?.description}
-              // value={(newDescription || currentTask?.description) ?? ''}
-              onChange={(e) => setNewDescription(e.target.value)}
-            />
-          ) : (
-            <span>{currentTask?.description ?? ''}</span>
-          )}
-        </EditorDescription>
-      </CardContentWrapper>
+          </EditorDescription>
+        </CardContentWrapper>
+      )}
       <CardActivityWrapper>
         <CardActivitiesTitle>Activities</CardActivitiesTitle>
         {currentTask?.activities && <Activities list={currentTask.activities || []} />}

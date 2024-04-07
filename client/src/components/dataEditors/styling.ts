@@ -7,6 +7,12 @@ export const EditorTitleWrapper = styled.div`
   justify-content: space-between;
   row-gap: 12px;
   width: 100%;
+
+  & .spinner {
+    position: relative;
+    min-width: 200px;
+    height: 40px;
+  }
   @media (max-width: 720px) {
     flex-wrap: wrap-reverse;
   }

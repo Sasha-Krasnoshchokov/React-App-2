@@ -13,6 +13,7 @@ import { IHistory } from '../../types/common';
 import requests from '../../api/api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import LoadingSpinner from '../general/LoadingSpinner';
 
 export const Activities: React.FC<{ list: IHistory[] }> = ({ list }) => (
   <HistoryList>
@@ -48,9 +49,7 @@ const HistoryPopup: React.FC<IProps> = () => {
   return (
     <HistoryPopupWrapper>
       <ModalTitle title="History" />
-      <HistoryList>
-        <Activities list={activities} />
-      </HistoryList>
+      <HistoryList>{activities.length === 0 ? <LoadingSpinner /> : <Activities list={activities} />}</HistoryList>
     </HistoryPopupWrapper>
   );
 };
