@@ -9,7 +9,7 @@ const API = axios.create({
 
 export type TMethod = 'get' | 'post' | 'patch' | 'delete';
 type TBody = IBoard | IBoardList | IBoardList[] | IBoardTask | IBoardTask[] | IHistory;
-type TEntity = 'boards' | 'lists' | 'tasks' | 'taskMove' | 'activities';
+type TEntity = 'server' | 'boards' | 'lists' | 'tasks' | 'taskMove' | 'activities';
 
 interface IQuery {
   entity: TEntity;
@@ -24,6 +24,7 @@ interface IUrlByEntity {
   taskId?: ID;
 }
 const urlByEntity: Record<TEntity, (props: IUrlByEntity) => string> = {
+  server: () => '',
   boards: ({ boardId }: IUrlByEntity) => `boards${boardId ? `/${boardId}` : ''}`,
   lists: ({ boardId, listId }: IUrlByEntity) =>
     `lists${
@@ -54,8 +55,8 @@ const apiFactory = ({ method, query, body }: IApiFactoryProps): Promise<AxiosRes
 
   try {
     return API[method](url, body);
-  } catch (e) {
-    console.error('Request failed', e);
+  } catch (error) {
+    console.error('Request failed', error);
     return null;
   }
 };

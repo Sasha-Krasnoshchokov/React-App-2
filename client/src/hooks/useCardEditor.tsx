@@ -20,6 +20,7 @@ const useCardEditor = () => {
   const { boardId, listId, taskId, action } = useSelector((state: RootState) => state.modalPopup.modalPopup);
 
   const [isEdit, setIsEdit] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newDueDate, setNewDueDate] = useState('');
@@ -28,20 +29,25 @@ const useCardEditor = () => {
   const [currentList, setCurrentList] = useState<IBoardList | null>(null);
 
   const getTaskById = useCallback(async () => {
+    setIsFetching(true);
     const response = await requests.get({
       entity: 'tasks',
       boardId: boardId ?? '',
       listId: listId ?? '',
       taskId: taskId ?? '',
     });
+    setIsFetching(false);
     setCurrentTask(response?.data?.data ?? null);
   }, [boardId, listId, taskId]);
+
   const getListById = useCallback(async () => {
+    setIsFetching(true);
     const response = await requests.get({
       entity: 'lists',
       boardId: boardId ?? '',
       listId: listId ?? '',
     });
+    setIsFetching(false);
     setCurrentList(response?.data?.data ?? null);
   }, [boardId, listId]);
 
@@ -135,6 +141,7 @@ const useCardEditor = () => {
 
   const updateServer = useCallback(
     async (method: TMethod, body?: IBoardTask | IHistory, entity?: 'activities') => {
+      setIsFetching(true);
       await requests[method]({
         query: {
           entity: entity ?? 'tasks',
@@ -144,6 +151,7 @@ const useCardEditor = () => {
         },
         body,
       });
+      setIsFetching(false);
     },
     [boardId, listId, taskId]
   );
@@ -238,7 +246,7 @@ const useCardEditor = () => {
     };
     await updateServer('post', newActivity, 'activities');
     dispatch(resetModalConfig());
-    dispatch(setIsContentUpdate({ shouldMainContentUpdate: true, shouldOperationMenuUpdate: true }));
+    dispatch(setIsContentUpdate({ shouldMainContentUpdate: true, shouldOperationMenuUpdate: false }));
   }, [
     action,
     createActivities,
@@ -284,6 +292,7 @@ const useCardEditor = () => {
   return {
     isEdit,
     newTitle,
+    isFetching,
     currentTask,
     newDescription,
     actionIconUrl: action === 'delete' ? deleteIconUrl : editIconUrl,

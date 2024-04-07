@@ -7,6 +7,7 @@ import { RootState } from '../../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsContentUpdate } from '../../../store/actions/contentUpdateSlicer';
 import { ID } from '../../../types/common';
+import LoadingSpinner from '../../general/LoadingSpinner';
 
 export interface IBoardListsContext {
   lists: IBoardList[];
@@ -20,10 +21,13 @@ const BoardContent: React.FC<IProps> = ({ boardId }) => {
   const dispatch = useDispatch();
   const { shouldMainContentUpdate } = useSelector((state: RootState) => state.contentUpdate);
 
+  const [isFetching, setIsFetching] = useState(false);
   const [lists, setLists] = useState<IBoardList[]>([]);
 
   const getData = useCallback(async () => {
+    setIsFetching(true);
     const response = await requests.get({ entity: 'lists', boardId });
+    setIsFetching(false);
     setLists(response?.data?.data ?? []);
     dispatch(setIsContentUpdate({ shouldMainContentUpdate: false, shouldOperationMenuUpdate: false }));
   }, [boardId, dispatch]);
@@ -37,19 +41,25 @@ const BoardContent: React.FC<IProps> = ({ boardId }) => {
   return (
     <BoardListsContext.Provider value={{ lists }}>
       <BoardContentWrapper>
-        {lists.length > 0 ? (
-          <BoardListsWrapper $columns={lists.length > 4 ? lists.length : 4}>
-            {lists.map((item, ind) => (
-              <React.Fragment key={`${item.title}-${ind}`}>
-                <BoardList
-                  column={ind + 1}
-                  list={item}
-                />
-              </React.Fragment>
-            ))}
-          </BoardListsWrapper>
+        {isFetching ? (
+          <LoadingSpinner position="centered" />
         ) : (
-          <p className="empty-content">You have no lists yet</p>
+          <>
+            {lists.length > 0 ? (
+              <BoardListsWrapper $columns={lists.length > 4 ? lists.length : 4}>
+                {lists.map((item, ind) => (
+                  <React.Fragment key={`${item.title}-${ind}`}>
+                    <BoardList
+                      column={ind + 1}
+                      list={item}
+                    />
+                  </React.Fragment>
+                ))}
+              </BoardListsWrapper>
+            ) : (
+              <p className="empty-content">You have no lists yet</p>
+            )}
+          </>
         )}
       </BoardContentWrapper>
     </BoardListsContext.Provider>
@@ -74,8 +84,6 @@ const BoardContentWrapper = styled.section`
 const BoardListsWrapper = styled.ul<{ $columns?: number }>`
   width: 100%;
   height: 100%;
-  // padding-bottom: 4px;
-  // overflow: auto hidden;
 
   ${({ $columns }) =>
     $columns

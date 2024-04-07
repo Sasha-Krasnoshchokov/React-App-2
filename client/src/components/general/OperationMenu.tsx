@@ -4,14 +4,22 @@ import styled from 'styled-components';
 import { AddNewEntity } from '../features/Actions';
 import ThreeDotsMenu from '../features/ThreeDotsMenu';
 import useOperationMenu from '../../hooks/useOperationMenu';
+import LoadingSpinner from './LoadingSpinner';
 
 interface IProps {
   classes: string;
 }
 
 const OperationMenu: React.FC<IProps> = ({ classes }) => {
-  const { activeMenu, dataFromServer, isAddEntityBtn, selectedOperationMenu, handleCreateBoard, handleOperationMenu } =
-    useOperationMenu();
+  const {
+    activeMenu,
+    isFetching,
+    dataFromServer,
+    isAddEntityBtn,
+    selectedOperationMenu,
+    handleCreateBoard,
+    handleOperationMenu,
+  } = useOperationMenu();
 
   return (
     <Wrapper className={classes}>
@@ -20,36 +28,40 @@ const OperationMenu: React.FC<IProps> = ({ classes }) => {
         role="button"
         className="bg-gray-dark rounded-lg"
       >
-        <List>
-          {isAddEntityBtn && (
-            <AddNewEntity
-              $theme="white"
-              onClick={handleCreateBoard}
-            >{`Add ${`${activeMenu.id ?? ''}`.slice(0, -1)}`}</AddNewEntity>
-          )}
-          {dataFromServer.map((item, ind) => (
-            <React.Fragment key={item.id ?? `board-${ind}`}>
-              <div className="list-item">
-                <div
-                  id={`${item.id ?? `board-${ind}`}`}
-                  className="select-btn"
-                  role="button"
-                  data-active={item.id === selectedOperationMenu?.id}
-                  onClick={() => handleOperationMenu(item)}
-                >
-                  <p className="ellipsis-text">{item.title}</p>
+        {isFetching ? (
+          <LoadingSpinner position="top-center" />
+        ) : (
+          <List>
+            {isAddEntityBtn && (
+              <AddNewEntity
+                $theme="white"
+                onClick={handleCreateBoard}
+              >{`Add ${`${activeMenu.id ?? ''}`.slice(0, -1)}`}</AddNewEntity>
+            )}
+            {dataFromServer.map((item, ind) => (
+              <React.Fragment key={item.id ?? `board-${ind}`}>
+                <div className="list-item">
+                  <div
+                    id={`${item.id ?? `board-${ind}`}`}
+                    className="select-btn"
+                    role="button"
+                    data-active={item.id === selectedOperationMenu?.id}
+                    onClick={() => handleOperationMenu(item)}
+                  >
+                    <p className="ellipsis-text">{item.title}</p>
+                  </div>
+                  <div className="dots-menu-wrapper">
+                    <ThreeDotsMenu
+                      menus={['edit', 'addList', 'delete']}
+                      boardId={item.id}
+                      $theme="white"
+                    />
+                  </div>
                 </div>
-                <div className="dots-menu-wrapper">
-                  <ThreeDotsMenu
-                    menus={['edit', 'addList', 'delete']}
-                    boardId={item.id}
-                    $theme="white"
-                  />
-                </div>
-              </div>
-            </React.Fragment>
-          ))}
-        </List>
+              </React.Fragment>
+            ))}
+          </List>
+        )}
       </OperationMenuBox>
     </Wrapper>
   );

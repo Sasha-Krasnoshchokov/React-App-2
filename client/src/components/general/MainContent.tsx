@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import ThreeDotsMenu from '../features/ThreeDotsMenu';
-// import requests from '../../api/api';
 import { setModalConfig } from '../../store/actions/modalPopupSlicer';
 import BoardContent from '../pages/boardPage/BoardContent';
 
