@@ -14,4 +14,4 @@ RUN npm install
 EXPOSE 4000
 
 # Specifies what command to run within the container
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:dev"]
