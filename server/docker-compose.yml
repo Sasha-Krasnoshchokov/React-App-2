@@ -11,6 +11,10 @@ services:
       - '5432:5432'
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: 'pg_isready --username=postgres && psql --username=postgres --list'
+      timeout: 10s
+      retries: 20
 
   app:
     build:
@@ -22,7 +26,8 @@ services:
     ports:
       - ${PORT}:${PORT}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./src:/server/src
 
