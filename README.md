@@ -16,5 +16,9 @@
       
    4. Running the server app (you should be in the * */server* * directory)
   - *using docker* ```$ docker compose up --build```
-  - *development in the watch mode* ```$ npm run start:dev```
-      (in this case you should change the .env file as per the comments)
+  - *development in the watch mode*
+      1. open the .env file and make changes according to the comments
+      2. open the docker-compose.yml file and make changes according to the comments
+      3. launch the postgres db in the docker using command ```$ docker compose up --build```
+      4. launch the server using the command ```$ npm run start:dev```
+      
