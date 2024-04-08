@@ -109,7 +109,6 @@ const CardEditor: React.FC<IProps> = ({ action }) => {
                 tabIndex={4}
                 placeholder="Add description"
                 defaultValue={currentTask?.description}
-                // value={(newDescription || currentTask?.description) ?? ''}
                 onChange={(e) => setNewDescription(e.target.value)}
               />
             ) : (
