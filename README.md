@@ -1,7 +1,7 @@
 # PoC of a Personal Project Management Tool
 
 **DEMO** [https://easyman.onrender.com/]
-  - you should wait some time while the app connects to the server (refresh page)
+  - you should wait some time (1 - 2 min) while the app connects to the server (refresh page)
 
 ## Local launch
 
