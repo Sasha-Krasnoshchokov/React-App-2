@@ -15,7 +15,7 @@ const useOperationMenu = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [selectedOperationMenu, setSelectedOperationMenu] = useState<IBoard | null>(null);
   const [dataFromServer, setDataFromServer] = useState<IBoard[]>([]);
-  const isAddEntityBtn = useMemo(() => activeMenu.id === 'boards' || activeMenu.id === 'teams', [activeMenu]);
+  const isAddEntityBtn = useMemo(() => activeMenu.id === 'boards', [activeMenu]);
 
   const handleCreateBoard = () => {
     dispatch(
