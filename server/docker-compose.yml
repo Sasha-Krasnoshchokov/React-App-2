@@ -1,7 +1,6 @@
 version: '3.5'
 services:
   postgres:
-    # db:
     image: postgres:16-alpine3.18
     restart: always
     environment:
@@ -16,6 +15,7 @@ services:
       timeout: 10s
       retries: 20
 
+# comment out the following service if you are running the server outside of docker
   app:
     build:
       context: .
@@ -31,6 +31,7 @@ services:
     volumes:
       - ./src:/server/src
 
+#  uncomment the following service if you want to have access to the DB via the CLI web
   # pgadmin:
   #   image: dpage/pgadmin4
   #   restart: always
